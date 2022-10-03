@@ -7,7 +7,11 @@
     "build": "tsc && npx prisma migrate deploy",
     "start": "node dist/src/serve.js",
     "dev": "nodemon src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:test": "dotenv -e .env.test prisma migrate dev && dotenv -e .env.test nodemon src/server.ts",
+    "prisma:migrate-test": "dotenv -e .env.test prisma migrate dev",
+    "test": "jest",
+    "test:unit": "dotenv -e .env.test jest -- -i --coverage --testPathPattern=tests/unit",
+    "test:integration": "dotenv -e .env.test jest -- -i --coverage --testPathPattern=tests/integration"
   },
   "author": "",
   "license": "ISC",
