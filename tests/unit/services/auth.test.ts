@@ -2,7 +2,7 @@ import * as userService from "../../../src/services/userService";
 import * as userRepository from "../../../src/repositories/userRepository";
 import bcrypt from "bcrypt";
 import { userFactory } from "../../factories/userFactory";
-import { unauthorizedError } from "../../../src/utils/errorUtils";
+import { unauthorizedError, conflictError } from "../../../src/utils/errorUtils";
 
 describe("Auth services unit tests", () => {
     beforeEach(() => {
@@ -48,5 +48,31 @@ describe("Auth services unit tests", () => {
         const promise = userService.login(user);
 
         expect(promise).rejects.toEqual(unauthorizedError("Invalid credentials"));
+    });
+
+    it("CreateUser to the service, create a new user", async () => {
+        const user = userFactory.userFactoryToCreateUser();
+
+        jest.spyOn(userRepository, "findUserByEmail").mockResolvedValue(null);
+        jest.spyOn(userRepository, "insertUser").mockImplementation((): any => {});
+
+        await userService.createUser(user);
+
+        expect(userRepository.insertUser).toBeCalled();
+    });
+
+    it("CreateUser to the service, does not allow creating a duplicate user", () => {
+        const user = userFactory.userFactoryToCreateUser();
+
+        jest.spyOn(userRepository, "findUserByEmail").mockResolvedValue({
+            id: "iduuid",
+            ...user
+        });
+        jest.spyOn(userRepository, "insertUser").mockImplementationOnce((): any => {});
+
+        const promise = userService.createUser(user);
+
+        expect(promise).rejects.toEqual(conflictError("User already exist"));
+        expect(userRepository.insertUser).not.toBeCalled();
     });
 });
