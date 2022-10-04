@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { userFactory } from "../../factories/userFactory";
 import { unauthorizedError, conflictError } from "../../../src/utils/errorUtils";
 
-describe("Auth services unit tests", () => {
+describe("User services unit tests", () => {
     beforeEach(() => {
         jest.resetAllMocks();
         jest.clearAllMocks();

@@ -23,8 +23,13 @@ const insertUser = async (user: UserData) => {
     });
 };
 
+const reset = async () => {
+    return await prisma.user.deleteMany();
+};
+
 export {
     findUserByEmail,
     findUserById,
-    insertUser
+    insertUser,
+    reset
 };

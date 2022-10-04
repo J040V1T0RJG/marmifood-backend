@@ -51,9 +51,14 @@ const createUser = async (user: CreateUserData) => {
     await userRepository.insertUser(userData);
 };
 
+const reset = async () => {
+    await userRepository.reset();
+};
+
 export {
     CreateUserData,
     UserData,
     login,
-    createUser
+    createUser,
+    reset
 };
