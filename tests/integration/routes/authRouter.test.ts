@@ -42,3 +42,52 @@ describe("Integration test of the '/sign-in' route", () => {
         expect(result.status).toBe(409);
     });
 });
+
+describe("Integration test of the '/sign-up' route", () => {
+    it("Must login and receive token, test login passing valid data", async () => {
+        const user = userFactory.userFactoryToCreateUser();
+
+        await supertest(app).post("/sign-up").send(user);
+        const result = await supertest(app).post("/sign-in").send({
+            email: user.email, 
+            password: user.password
+        });
+
+        const countData = Object.keys(result.body).length;
+
+        expect(result.status).toBe(200);
+        expect(result.body).toBeInstanceOf(Object);
+        expect(countData).toBe(1)
+    });
+
+    it("Should return statusCode 422, if user request is not processed due to semantic errors", async () => {
+        const user = {
+            email: "invalidEmail",
+            password: "randomPassword"
+        };
+
+        const result = await supertest(app).post("/sign-in").send(user);
+
+        expect(result.status).toBe(422);
+    });
+
+    it("Should return statusCode 401, if email does not exist in databse", async () => {
+        const user = userFactory.userFactoryToLogin();
+
+        const result = await supertest(app).post("/sign-in").send(user);
+
+        expect(result.status).toBe(401);
+    });
+
+    it("Should return statusCode 401, if password is incorrect", async () => {
+        const user = userFactory.userFactoryToCreateUser();
+
+        await supertest(app).post("/sign-up").send(user);
+        const result = await supertest(app).post("/sign-in").send({
+            email: user.email,
+            password: "invalidPassword1234."
+        });
+
+        expect(result.status).toBe(401);
+    });
+});
